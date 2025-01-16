@@ -65,6 +65,9 @@ export default function useDBHelper() {
       content: content,
     };
 
+    const thisNotebook = notebooks.find((n) => n.id === notebookId);
+    thisNotebook?.blocks.push(newBlock);
+    updateVersions(notebookId, newBlock.id);
     return newBlock;
   }
 
@@ -109,6 +112,7 @@ export default function useDBHelper() {
     notebook.blocks = notebook.blocks.filter((b) => b.id !== blockId);
 
     replaceNotebook(notebook);
+    updateVersions(notebookId, blockId);
   }
 
   /**

@@ -37,9 +37,7 @@ export function NotebookSideBar() {
       if (!currentNotebook) return;
 
       // send change message to db
-      const newBlock = dbHelper.createNewBlock(type, currentNotebook.id);
-      currentNotebook.blocks.push(newBlock);
-      setCurrentNotebook({ ...currentNotebook });
+      dbHelper.createNewBlock(type, currentNotebook.id);
     };
   }
 
