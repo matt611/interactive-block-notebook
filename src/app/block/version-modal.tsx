@@ -56,11 +56,13 @@ export default function VersionModal() {
       } catch (e) {
         alert(`json parse err: ${e}`);
       }
+      setVersionName("");
       toggleOpen(false);
     };
   }
   function tagVersion() {
     dbHelper.nameVersion(versionName, currentNotebook!.id, blockId);
+    setVersionName("");
     toggleOpen(false);
   }
 
