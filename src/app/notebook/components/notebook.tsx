@@ -4,7 +4,7 @@ import { useNotebookContext } from "@/hooks/contexts";
 import NotebookTitle from "../../block/notebook-title/notebook-title";
 import { BLOCK_FUNCTION_MAP } from "@/constants";
 import EditBlockModal from "@/app/block/edit-block-modal";
-import RevertModal from "@/app/block/revert-modal";
+import VersionModal from "@/app/block/version-modal";
 
 export default function Notebook() {
   const notebookContext = useNotebookContext();
@@ -24,7 +24,7 @@ export default function Notebook() {
   return (
     <div className={mainClassName}>
       <EditBlockModal />
-      <RevertModal />
+      <VersionModal />
       <NotebookTitle
         blockId={currentNotebook.id}
         content={titleBlockContent}

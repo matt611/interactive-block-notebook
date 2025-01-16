@@ -15,7 +15,7 @@ const EMPTY_CHANGE_VECTOR: ChangeVector = {
 };
 
 export type VersionRecord = {
-  date: Date;
+  title: string;
   contentJSON: string;
 };
 

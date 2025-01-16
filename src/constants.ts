@@ -82,3 +82,5 @@ export const BLOCK_MENU_ITEMS = [
     type: BlockType.CHEMICAL_DRAWING,
   },
 ];
+
+export const DATE_FORMAT = "MM-dd-yyyy h:m:s";

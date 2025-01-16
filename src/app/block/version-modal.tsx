@@ -7,11 +7,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useNotebookContext } from "@/hooks/contexts";
-import { format } from "date-fns";
 
 import useDBHelper from "@/hooks/db-helper";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
 
-export default function RevertModal() {
+export default function VersionModal() {
+  const [versionName, setVersionName] = useState("");
   const dbHelper = useDBHelper();
   const notebookContext = useNotebookContext();
   const [currentNotebook, setCurrentNotebook] =
@@ -56,6 +59,11 @@ export default function RevertModal() {
       toggleOpen(false);
     };
   }
+  function tagVersion() {
+    dbHelper.nameVersion(versionName, currentNotebook!.id, blockId);
+    toggleOpen(false);
+  }
+
   return (
     <Dialog open={versionModalState?.isModalOpen} onOpenChange={toggleOpen}>
       <DialogContent>
@@ -63,16 +71,29 @@ export default function RevertModal() {
         <DialogHeader>
           <DialogTitle>Version History</DialogTitle>
         </DialogHeader>
+        <Label htmlFor="version">Name the current version:</Label>
+        <div className="flex gap-2">
+          <Input
+            id="version"
+            value={versionName}
+            onChange={(e) => setVersionName(e.target.value)}
+            required
+          ></Input>
+          <Button onClick={tagVersion}>Tag</Button>
+        </div>
+
+        <Label>Revert to previous version:</Label>
         {!versions.length && <div>No versions!</div>}
         {versions.map((versionRecord, i) => {
           return (
-            <Button
-              variant="ghost"
-              onClick={buildOnclick(versionRecord.contentJSON)}
-              key={i}
-            >
-              {format(versionRecord.date, "MM-dd-yyyy h:m:s")}
-            </Button>
+            <div key={i}>
+              <Button
+                variant="ghost"
+                onClick={buildOnclick(versionRecord.contentJSON)}
+              >
+                {versionRecord.title}
+              </Button>
+            </div>
           );
         })}
       </DialogContent>

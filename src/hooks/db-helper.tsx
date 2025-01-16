@@ -3,7 +3,8 @@
 import { BlockType, tBlock, tNotebook } from "@/types";
 import { useNotebookContext, VersionRecord } from "./contexts";
 import uuid from "react-uuid";
-import { DEFAULT_BLOCK_CONTENT_MAP } from "@/constants";
+import { DATE_FORMAT, DEFAULT_BLOCK_CONTENT_MAP } from "@/constants";
+import { format } from "date-fns";
 
 const VERSION_THRESHOLD = 1;
 
@@ -143,22 +144,12 @@ export default function useDBHelper() {
   function updateNotebookVersion(notebookId: string) {
     if (!notebookId) return;
 
-    const thisNotebook = getNotebook(notebookId);
-    if (!thisNotebook) return;
-
     changeVector.notebooks[notebookId] =
       changeVector.notebooks[notebookId] || 0;
     changeVector.notebooks[notebookId]++;
 
     if (changeVector.notebooks[notebookId] % VERSION_THRESHOLD === 0) {
-      const version: VersionRecord = {
-        date: new Date(),
-        contentJSON: JSON.stringify(thisNotebook),
-      };
-
-      notebookVersions[notebookId] = notebookVersions[notebookId] || [];
-      notebookVersions[notebookId].push(version);
-      setNotebookVesions({ ...notebookVersions });
+      nameNotebookVersion(format(new Date(), DATE_FORMAT), notebookId);
     }
   }
 
@@ -171,27 +162,53 @@ export default function useDBHelper() {
   function updateBlockVersion(notebookId: string, blockId: string) {
     if (!notebookId || !blockId) return;
 
-    const thisNotebook = getNotebook(notebookId);
-    if (!thisNotebook) return;
-    const thisBlock = thisNotebook.blocks.find((b) => b.id === blockId);
-    if (!thisBlock) return;
-
     // increment change vectors
     changeVector.blocks[blockId] = changeVector.blocks[blockId] || 0;
     changeVector.blocks[blockId]++;
 
     if (changeVector.blocks[blockId] % VERSION_THRESHOLD === 0) {
-      const version: VersionRecord = {
-        date: new Date(),
-        contentJSON: JSON.stringify(thisBlock.content),
-      };
-
-      blockVersions[blockId] = blockVersions[blockId] || [];
-      blockVersions[blockId].push(version);
-      setBlockVesionStore({ ...blockVersions });
+      nameBlockVersion(format(new Date(), DATE_FORMAT), notebookId, blockId);
     }
 
     setChangeVector({ ...changeVector });
+  }
+
+  function nameBlockVersion(
+    title: string,
+    notebookId: string,
+    blockId: string
+  ) {
+    const thisNotebook = getNotebook(notebookId);
+    if (!thisNotebook) return;
+    const thisBlock = thisNotebook.blocks.find((b) => b.id === blockId);
+    if (!thisBlock) return;
+    const version: VersionRecord = {
+      title,
+      contentJSON: JSON.stringify(thisBlock.content),
+    };
+
+    blockVersions[blockId] = blockVersions[blockId] || [];
+    blockVersions[blockId].push(version);
+    setBlockVesionStore({ ...blockVersions });
+  }
+
+  function nameNotebookVersion(title: string, notebookId: string) {
+    const thisNotebook = getNotebook(notebookId);
+    if (!thisNotebook) return;
+
+    const version: VersionRecord = {
+      title,
+      contentJSON: JSON.stringify(thisNotebook),
+    };
+
+    notebookVersions[notebookId] = notebookVersions[notebookId] || [];
+    notebookVersions[notebookId].push(version);
+    setNotebookVesions({ ...notebookVersions });
+  }
+
+  function nameVersion(title: string, notebookId: string, blockId?: string) {
+    if (blockId) nameBlockVersion(title, notebookId, blockId);
+    else nameNotebookVersion(title, notebookId);
   }
 
   /**
@@ -224,5 +241,6 @@ export default function useDBHelper() {
     deleteBlock,
     updateBlock,
     replaceNotebook,
+    nameVersion,
   };
 }
